@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import openai
 import os
 import sys
@@ -60,6 +59,13 @@ def remove_wrapping_triple_quotes(code):
         code_lines = code_lines[1:-1]
     return '\n'.join(code_lines)
 
+def split_paragraph_hint(string):
+    if ">>>" in string:
+        index = string.index(">>>")
+        return (string[:index], string[index+3:])
+    else:
+        return (string, None)
+
 # ------------------
 # Generic completion
 # ------------------
@@ -77,9 +83,45 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 # Text related
 # ------------
 
-# - create blog helping utilities
-#   - complete sentence (somehow get previous paragraphs as context, fill last unfinished sentence, maybe with hints in some specific format)
-#   - Translation and proofread
+def complete_sentence(text):
+    (paragraph, hints) = split_paragraph_hint(text)
+
+    if hints is None:
+        prompt = f"""
+        Complete the last sentence of the text referenced by @TEXT based on the existing text.
+        Just return the last, completed sentence.
+
+        @TEXT: ```{paragraph}```
+        """
+        return get_completion(prompt)
+    else:
+        prompt = f"""
+        Complete the last sentence of the text referenced by @TEXT based on @HINTS.
+        Just return the last, completed sentence.
+
+        @TEXT: ```{paragraph}```
+        @HINTS: ```{hints}```
+        """
+        return get_completion(prompt)
+
+# TODO: diff!
+def proofread(text):
+    prompt = f"""
+    Proofread and correct the following text
+    and rewrite the corrected version. If you don't find
+    and errors, just say "No errors found". Don't use
+    any punctuation around the text:
+    ```{text}```
+    """
+    response = get_completion(prompt)
+    if response == "No errors found":
+        return response
+    else:
+        # TODO: redlines is not good for the terminal
+        # from redlines import Redlines
+        # diff = Redlines(text,response)
+        # return diff.output_markdown
+        return response
 
 # --------------
 # Coding related
@@ -101,7 +143,7 @@ def implement_todos(spec, unit_name):
     Modify the following {unit_name} based on the instructions in TODO comments.
     If you find any functions in the code that you don't know about, just assume they are working correctly and leave them as they are.
 
-    {spec}
+    ```{spec}```
 
     Only return the code, nothing else.
     """
@@ -156,8 +198,8 @@ def write_function_for_examples(code, unit_name):
     """
     return get_completion(prompt)
 
-
 spec = read_stdin()
 unit_name = get_unit_name(get_file_ext())
 print(write_function(spec, unit_name))
+# print(proofread(spec))
 
