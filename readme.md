@@ -45,6 +45,8 @@ echo "${prompt}" | get_openai_completion.sh <operation> <file_ext>
 echo "Create a dockerfile for nodejs and yarn" | get_openai_completion.sh complete
 ```
 
+![image](https://github.com/dodie/vim-openai/assets/1114220/df638948-9692-4116-9c0d-fff585b79de6)
+
 ### Vim
 
 TODO
