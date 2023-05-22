@@ -8,6 +8,8 @@
 
 ## Usage
 
+Export your OpenAI key in the `OPENAI_KEY` environment variable.
+
 ### Vim
 
 - Write prompt
