@@ -49,4 +49,4 @@ echo "Create a dockerfile for nodejs and yarn" | get_openai_completion.sh comple
 
 ### Vim
 
-TODO
+![image](https://github.com/dodie/vim-openai/assets/1114220/caf7840e-b7e1-411a-81ab-6826ed7bac8d)
